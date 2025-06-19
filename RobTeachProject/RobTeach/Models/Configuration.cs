@@ -14,6 +14,26 @@ namespace RobTeach.Models
         public string ProductName { get; set; } = string.Empty;
 
         /// <summary>
+        /// Gets or sets the raw content of the DXF file associated with this configuration.
+        /// </summary>
+        public string DxfFileContent { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets the Modbus IP Address for robot communication.
+        /// </summary>
+        public string ModbusIpAddress { get; set; } = "127.0.0.1"; // Default IP
+
+        /// <summary>
+        /// Gets or sets the Modbus Port for robot communication.
+        /// </summary>
+        public int ModbusPort { get; set; } = 502; // Default Port
+
+        /// <summary>
+        /// Gets or sets the settings related to the CAD canvas view state.
+        /// </summary>
+        public CanvasViewSettings CanvasState { get; set; } = new CanvasViewSettings();
+
+        /// <summary>
         /// Gets or sets the list of trajectories defined for this product configuration.
         /// This might be deprecated in favor of SprayPasses.
         /// </summary>

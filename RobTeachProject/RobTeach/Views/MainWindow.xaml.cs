@@ -15,8 +15,10 @@ using System.Linq;
 using IxMilia.Dxf; // Required for DxfFile
 using IxMilia.Dxf.Entities;
 using System.Diagnostics; // Added for Debug.WriteLine
-// using netDxf.Header; // No longer needed with IxMilia.Dxf
 using System.IO;
+using System.Text; // Added for Encoding
+
+// using netDxf.Header; // No longer needed with IxMilia.Dxf
 // using System.Windows.Threading; // Was for optional Dispatcher.Invoke, not currently used.
 // using System.Text.RegularExpressions; // Was for optional IP validation, not currently used.
 
@@ -1297,7 +1299,101 @@ namespace RobTeach.Views
                 try
                 {
                     _currentConfiguration = _configService.LoadConfiguration(openFileDialog.FileName);
+                    if (_currentConfiguration == null)
+                    {
+                        MessageBox.Show("Failed to load configuration file. The file might be corrupt or not a valid configuration.", "Load Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        StatusTextBlock.Text = "Error: Failed to deserialize configuration.";
+                        // Initialize a default empty configuration to prevent null reference issues later
+                        _currentConfiguration = new Models.Configuration { ProductName = $"Product_{DateTime.Now:yyyyMMddHHmmss}" };
+                        // No further processing if config is null
+                    }
+
                     ProductNameTextBox.Text = _currentConfiguration.ProductName;
+
+                    // Restore Modbus Settings
+                    ModbusIpAddressTextBox.Text = _currentConfiguration.ModbusIpAddress;
+                    ModbusPortTextBox.Text = _currentConfiguration.ModbusPort.ToString();
+
+                    // Restore Canvas View State
+                    if (_currentConfiguration.CanvasState != null)
+                    {
+                        _scaleTransform.ScaleX = _currentConfiguration.CanvasState.ScaleX;
+                        _scaleTransform.ScaleY = _currentConfiguration.CanvasState.ScaleY;
+                        _translateTransform.X = _currentConfiguration.CanvasState.TranslateX;
+                        _translateTransform.Y = _currentConfiguration.CanvasState.TranslateY;
+                    }
+
+                    // Load Embedded DXF Content
+                    if (!string.IsNullOrEmpty(_currentConfiguration.DxfFileContent))
+                    {
+                        // Reset current DXF state
+                        CadCanvas.Children.Clear();
+                        _wpfShapeToDxfEntityMap.Clear();
+                        _trajectoryPreviewPolylines.Clear();
+                        _selectedDxfEntities.Clear();
+                        _dxfEntityHandleMap.Clear();
+                        _currentDxfDocument = null;
+                        _dxfBoundingBox = Rect.Empty;
+                        _currentDxfFilePath = "(Embedded DXF from project file)";
+
+                        try
+                        {
+                            using (var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(_currentConfiguration.DxfFileContent)))
+                            {
+                                _currentDxfDocument = DxfFile.Load(memoryStream);
+                            }
+
+                            if (_currentDxfDocument != null)
+                            {
+                                List<System.Windows.Shapes.Shape> wpfShapes = _cadService.GetWpfShapesFromDxf(_currentDxfDocument);
+                                int shapeIndex = 0;
+                                foreach(var entity in _currentDxfDocument.Entities)
+                                {
+                                    if (shapeIndex < wpfShapes.Count && wpfShapes[shapeIndex] != null)
+                                    {
+                                        var wpfShape = wpfShapes[shapeIndex];
+                                        wpfShape.Stroke = DefaultStrokeBrush;
+                                        wpfShape.StrokeThickness = DefaultStrokeThickness;
+                                        wpfShape.MouseLeftButtonDown += OnCadEntityClicked;
+                                        _wpfShapeToDxfEntityMap[wpfShape] = entity;
+                                        CadCanvas.Children.Add(wpfShape);
+                                        shapeIndex++;
+                                    }
+                                }
+                                _dxfBoundingBox = GetDxfBoundingBox(_currentDxfDocument);
+                                PerformFitToView();
+                                StatusTextBlock.Text = "Loaded embedded DXF and configuration from project file.";
+                            }
+                            else // Should ideally be caught by DxfFile.Load exception
+                            {
+                                StatusTextBlock.Text = "Project file loaded, but embedded DXF content was invalid or empty.";
+                                _currentDxfDocument = null; // Ensure it's null
+                            }
+                        }
+                        catch (Exception dxfEx)
+                        {
+                            StatusTextBlock.Text = "Project file loaded, but failed to load embedded DXF content.";
+                            MessageBox.Show($"Failed to load embedded DXF content from the project file. It might be corrupt.\nError: {dxfEx.Message}", "DXF Load Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            _currentDxfDocument = null; // Ensure it's null
+                             // Clear canvas again in case partial loading happened before error, or if an error occurred in GetWpfShapesFromDxf
+                            CadCanvas.Children.Clear();
+                            _wpfShapeToDxfEntityMap.Clear();
+                        }
+                    }
+                    else
+                    {
+                        // No embedded DXF content, clear existing DXF from canvas
+                        CadCanvas.Children.Clear();
+                        _wpfShapeToDxfEntityMap.Clear();
+                        _trajectoryPreviewPolylines.Clear();
+                        _selectedDxfEntities.Clear();
+                        _dxfEntityHandleMap.Clear();
+                        _currentDxfDocument = null;
+                        _currentDxfFilePath = null; // No active DXF file path
+                        _dxfBoundingBox = Rect.Empty;
+                        PerformFitToView(); // Reset view if no DXF
+                        StatusTextBlock.Text = "Configuration loaded (no embedded DXF).";
+                    }
 
                     // Initialize Spray Passes from loaded configuration
                     if (_currentConfiguration.SprayPasses == null || !_currentConfiguration.SprayPasses.Any())
@@ -1765,13 +1861,56 @@ namespace RobTeach.Views
             if (saveFileDialog.ShowDialog() == true)
             {
                 // Ensure the _currentConfiguration object has the latest product name from the UI
-                // This is done before deciding what to filter into configToSave.
                 _currentConfiguration.ProductName = ProductNameTextBox.Text;
+
+                // Populate DxfFileContent
+                if (!string.IsNullOrEmpty(_currentDxfFilePath) && File.Exists(_currentDxfFilePath))
+                {
+                    try
+                    {
+                        _currentConfiguration.DxfFileContent = File.ReadAllText(_currentDxfFilePath);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"Warning: Could not embed DXF file content in the project file: {ex.Message}");
+                        MessageBox.Show($"Warning: Could not embed DXF file content in the project file: {ex.Message}", "File Read Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        _currentConfiguration.DxfFileContent = string.Empty;
+                    }
+                }
+                else
+                {
+                    _currentConfiguration.DxfFileContent = string.Empty;
+                }
+
+                // Populate Modbus Settings
+                _currentConfiguration.ModbusIpAddress = ModbusIpAddressTextBox.Text;
+                if (int.TryParse(ModbusPortTextBox.Text, out int parsedPort) && parsedPort >= 1 && parsedPort <= 65535)
+                {
+                    _currentConfiguration.ModbusPort = parsedPort;
+                }
+                else
+                {
+                    _currentConfiguration.ModbusPort = 502; // Default port
+                }
+
+                // Populate CanvasState
+                _currentConfiguration.CanvasState ??= new CanvasViewSettings(); // Ensure not null
+                _currentConfiguration.CanvasState.ScaleX = _scaleTransform.ScaleX;
+                _currentConfiguration.CanvasState.ScaleY = _scaleTransform.ScaleY;
+                _currentConfiguration.CanvasState.TranslateX = _translateTransform.X;
+                _currentConfiguration.CanvasState.TranslateY = _translateTransform.Y;
+
+                // This is done before deciding what to filter into configToSave.
 
                 Configuration configToSave = new Configuration
                 {
                     ProductName = _currentConfiguration.ProductName,
                     CurrentPassIndex = _currentConfiguration.CurrentPassIndex, // Preserve the selected pass index
+                    // NEW: Copy new fields
+                    DxfFileContent = _currentConfiguration.DxfFileContent,
+                    ModbusIpAddress = _currentConfiguration.ModbusIpAddress,
+                    ModbusPort = _currentConfiguration.ModbusPort,
+                    CanvasState = _currentConfiguration.CanvasState,
                     SprayPasses = new List<SprayPass>()
                 };
 
