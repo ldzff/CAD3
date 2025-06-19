@@ -39,6 +39,7 @@ namespace RobTeach.Views
         private string? _currentLoadedConfigPath; // Path to the last successfully loaded configuration file.
         private Models.Configuration _currentConfiguration; // The active configuration, either loaded or built from selections.
         private bool isConfigurationDirty = false;
+        private RobTeach.Models.Trajectory _trajectoryInDetailView;
 
         // Collections for managing DXF entities and their WPF shape representations
         private readonly List<DxfEntity> _selectedDxfEntities = new List<DxfEntity>(); // Stores original DXF entities selected by the user.
@@ -554,6 +555,8 @@ namespace RobTeach.Views
             // Nozzle settings part
             if (CurrentPassTrajectoriesListBox.SelectedItem is Trajectory selectedTrajectory)
             {
+                _trajectoryInDetailView = selectedTrajectory; // Assign to the new field
+
                 // Enable all nozzle checkboxes
                 TrajectoryUpperNozzleEnabledCheckBox.IsEnabled = true;
                 TrajectoryLowerNozzleEnabledCheckBox.IsEnabled = true;
@@ -602,9 +605,17 @@ namespace RobTeach.Views
                 {
                     CircleCenterZTextBox.Text = selectedTrajectory.CircleCenter.Z.ToString("F3");
                 }
+
+                // Set Tags for Z-coordinate TextBoxes
+                LineStartZTextBox.Tag = selectedTrajectory;
+                LineEndZTextBox.Tag = selectedTrajectory;
+                ArcCenterZTextBox.Tag = selectedTrajectory;
+                CircleCenterZTextBox.Tag = selectedTrajectory;
             }
             else // No trajectory selected
             {
+                _trajectoryInDetailView = null; // Clear the field
+
                 // Disable and uncheck all nozzle checkboxes
                 TrajectoryUpperNozzleEnabledCheckBox.IsEnabled = false;
                 TrajectoryUpperNozzleGasOnCheckBox.IsEnabled = false;
@@ -630,6 +641,12 @@ namespace RobTeach.Views
                 LineEndZTextBox.Text = string.Empty;
                 ArcCenterZTextBox.Text = string.Empty;
                 CircleCenterZTextBox.Text = string.Empty;
+
+                // Clear Tags for Z-coordinate TextBoxes
+                LineStartZTextBox.Tag = null;
+                LineEndZTextBox.Tag = null;
+                ArcCenterZTextBox.Tag = null;
+                CircleCenterZTextBox.Tag = null;
             }
         }
 
@@ -775,15 +792,15 @@ namespace RobTeach.Views
 
     private void UpdateLineStartZFromTextBox()
     {
-        if (CurrentPassTrajectoriesListBox.SelectedItem is Trajectory selectedTrajectory && selectedTrajectory.PrimitiveType == "Line")
+        if (_trajectoryInDetailView != null && _trajectoryInDetailView.PrimitiveType == "Line")
         {
             if (double.TryParse(LineStartZTextBox.Text, out double newZ))
             {
-                if (selectedTrajectory.LineStartPoint.Z != newZ)
+                if (_trajectoryInDetailView.LineStartPoint.Z != newZ)
                 {
-                    selectedTrajectory.LineStartPoint = new DxfPoint(
-                        selectedTrajectory.LineStartPoint.X,
-                        selectedTrajectory.LineStartPoint.Y,
+                    _trajectoryInDetailView.LineStartPoint = new DxfPoint(
+                        _trajectoryInDetailView.LineStartPoint.X,
+                        _trajectoryInDetailView.LineStartPoint.Y,
                         newZ);
                     isConfigurationDirty = true;
                     CurrentPassTrajectoriesListBox.Items.Refresh(); // Refresh if Z might be part of ToString()
@@ -791,28 +808,30 @@ namespace RobTeach.Views
             }
             else
             {
-                MessageBox.Show("Invalid Z value. Please enter a valid number.", "Input Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                LineStartZTextBox.Text = selectedTrajectory.LineStartPoint.Z.ToString("F3"); // Revert
+                MessageBox.Show("Invalid Start Z value. Please enter a valid number.", "Input Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                LineStartZTextBox.Text = _trajectoryInDetailView.LineStartPoint.Z.ToString("F3");
             }
         }
     }
 
-    private void LineStartZTextBox_LostFocus(object sender, RoutedEventArgs e)
+    private void LineStartZTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         UpdateLineStartZFromTextBox();
     }
 
+    // Removed LineStartZTextBox_LostFocus
+
     private void UpdateLineEndZFromTextBox()
     {
-        if (CurrentPassTrajectoriesListBox.SelectedItem is Trajectory selectedTrajectory && selectedTrajectory.PrimitiveType == "Line")
+        if (_trajectoryInDetailView != null && _trajectoryInDetailView.PrimitiveType == "Line")
         {
             if (double.TryParse(LineEndZTextBox.Text, out double newZ))
             {
-                if (selectedTrajectory.LineEndPoint.Z != newZ)
+                if (_trajectoryInDetailView.LineEndPoint.Z != newZ)
                 {
-                    selectedTrajectory.LineEndPoint = new DxfPoint(
-                        selectedTrajectory.LineEndPoint.X,
-                        selectedTrajectory.LineEndPoint.Y,
+                    _trajectoryInDetailView.LineEndPoint = new DxfPoint(
+                        _trajectoryInDetailView.LineEndPoint.X,
+                        _trajectoryInDetailView.LineEndPoint.Y,
                         newZ);
                     isConfigurationDirty = true;
                     CurrentPassTrajectoriesListBox.Items.Refresh(); // Refresh if Z might be part of ToString()
@@ -820,28 +839,30 @@ namespace RobTeach.Views
             }
             else
             {
-                MessageBox.Show("Invalid Z value. Please enter a valid number.", "Input Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                LineEndZTextBox.Text = selectedTrajectory.LineEndPoint.Z.ToString("F3"); // Revert
+                MessageBox.Show("Invalid End Z value. Please enter a valid number.", "Input Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                LineEndZTextBox.Text = _trajectoryInDetailView.LineEndPoint.Z.ToString("F3");
             }
         }
     }
 
-    private void LineEndZTextBox_LostFocus(object sender, RoutedEventArgs e)
+    private void LineEndZTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         UpdateLineEndZFromTextBox();
     }
 
+    // Removed LineEndZTextBox_LostFocus
+
     private void UpdateArcCenterZFromTextBox()
     {
-        if (CurrentPassTrajectoriesListBox.SelectedItem is Trajectory selectedTrajectory && selectedTrajectory.PrimitiveType == "Arc")
+        if (_trajectoryInDetailView != null && _trajectoryInDetailView.PrimitiveType == "Arc")
         {
             if (double.TryParse(ArcCenterZTextBox.Text, out double newZ))
             {
-                if (selectedTrajectory.ArcCenter.Z != newZ)
+                if (_trajectoryInDetailView.ArcCenter.Z != newZ)
                 {
-                    selectedTrajectory.ArcCenter = new DxfPoint(
-                        selectedTrajectory.ArcCenter.X,
-                        selectedTrajectory.ArcCenter.Y,
+                    _trajectoryInDetailView.ArcCenter = new DxfPoint(
+                        _trajectoryInDetailView.ArcCenter.X,
+                        _trajectoryInDetailView.ArcCenter.Y,
                         newZ);
                     isConfigurationDirty = true;
                     CurrentPassTrajectoriesListBox.Items.Refresh(); // Refresh if Z might be part of ToString()
@@ -849,28 +870,30 @@ namespace RobTeach.Views
             }
             else
             {
-                MessageBox.Show("Invalid Z value. Please enter a valid number.", "Input Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                ArcCenterZTextBox.Text = selectedTrajectory.ArcCenter.Z.ToString("F3"); // Revert
+                MessageBox.Show("Invalid Arc Center Z value. Please enter a valid number.", "Input Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ArcCenterZTextBox.Text = _trajectoryInDetailView.ArcCenter.Z.ToString("F3");
             }
         }
     }
 
-    private void ArcCenterZTextBox_LostFocus(object sender, RoutedEventArgs e)
+    private void ArcCenterZTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         UpdateArcCenterZFromTextBox();
     }
 
+    // Removed ArcCenterZTextBox_LostFocus
+
     private void UpdateCircleCenterZFromTextBox()
     {
-        if (CurrentPassTrajectoriesListBox.SelectedItem is Trajectory selectedTrajectory && selectedTrajectory.PrimitiveType == "Circle")
+        if (_trajectoryInDetailView != null && _trajectoryInDetailView.PrimitiveType == "Circle")
         {
             if (double.TryParse(CircleCenterZTextBox.Text, out double newZ))
             {
-                if (selectedTrajectory.CircleCenter.Z != newZ)
+                if (_trajectoryInDetailView.CircleCenter.Z != newZ)
                 {
-                    selectedTrajectory.CircleCenter = new DxfPoint(
-                        selectedTrajectory.CircleCenter.X,
-                        selectedTrajectory.CircleCenter.Y,
+                    _trajectoryInDetailView.CircleCenter = new DxfPoint(
+                        _trajectoryInDetailView.CircleCenter.X,
+                        _trajectoryInDetailView.CircleCenter.Y,
                         newZ);
                     isConfigurationDirty = true;
                     CurrentPassTrajectoriesListBox.Items.Refresh(); // Refresh if Z might be part of ToString()
@@ -878,16 +901,18 @@ namespace RobTeach.Views
             }
             else
             {
-                MessageBox.Show("Invalid Z value. Please enter a valid number.", "Input Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                CircleCenterZTextBox.Text = selectedTrajectory.CircleCenter.Z.ToString("F3"); // Revert
+                MessageBox.Show("Invalid Circle Center Z value. Please enter a valid number.", "Input Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                CircleCenterZTextBox.Text = _trajectoryInDetailView.CircleCenter.Z.ToString("F3");
             }
         }
     }
 
-    private void CircleCenterZTextBox_LostFocus(object sender, RoutedEventArgs e)
+    private void CircleCenterZTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         UpdateCircleCenterZFromTextBox();
     }
+
+    // Removed CircleCenterZTextBox_LostFocus
 
         /// <summary>
         /// Handles the Closing event of the window. Ensures Modbus connection is disconnected.
@@ -1609,6 +1634,8 @@ namespace RobTeach.Views
         private bool PerformSaveOperation()
         {
             // Call update methods at the beginning of save operation
+            // These methods now use _trajectoryInDetailView, which should reflect the
+            // trajectory whose details are currently shown (and potentially edited) in the UI.
             UpdateLineStartZFromTextBox();
             UpdateLineEndZFromTextBox();
             UpdateArcCenterZFromTextBox();
