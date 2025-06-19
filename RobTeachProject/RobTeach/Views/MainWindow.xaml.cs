@@ -1419,6 +1419,33 @@ namespace RobTeach.Views
                 return;
             }
 
+            // Ensure points are populated for the trajectories in the current pass
+            if (_currentConfiguration.CurrentPassIndex >= 0 &&
+                _currentConfiguration.CurrentPassIndex < _currentConfiguration.SprayPasses.Count)
+            {
+                SprayPass currentPass = _currentConfiguration.SprayPasses[_currentConfiguration.CurrentPassIndex];
+                if (currentPass.Trajectories != null)
+                {
+                    foreach (var trajectory in currentPass.Trajectories)
+                    {
+                        PopulateTrajectoryPoints(trajectory); // Assumes PopulateTrajectoryPoints(trajectory) exists and is accessible
+                    }
+                }
+            }
+            else if (_currentConfiguration.SprayPasses == null || _currentConfiguration.SprayPasses.Count == 0)
+            {
+                // No spray passes, so nothing to populate. SendConfiguration will handle this.
+            }
+            else
+            {
+                // Invalid CurrentPassIndex, but SprayPasses exist.
+                // SendConfiguration will return an error for invalid index.
+                // No points to populate here for sending.
+                // Optionally, show a MessageBox here too, but ModbusService will also report it.
+                MessageBox.Show($"Cannot send: Invalid current spray pass index ({_currentConfiguration.CurrentPassIndex}).", "Configuration Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return; // Prevent sending if pass index is clearly wrong but passes exist
+            }
+
             _currentConfiguration.ProductName = ProductNameTextBox.Text; // Ensure latest product name
             ModbusResponse response = _modbusService.SendConfiguration(_currentConfiguration);
 

@@ -95,13 +95,37 @@ namespace RobTeach.Services
         public ModbusResponse SendConfiguration(Models.Configuration config)
         {
             if (!IsConnected) return ModbusResponse.Fail("Error: Not connected to Modbus server. Please connect first.");
-            if (config == null || config.Trajectories == null || !config.Trajectories.Any())
-                return ModbusResponse.Fail("Error: No configuration data or trajectories available to send.");
+
+            List<Trajectory> trajectoriesToProcess;
+            if (config == null)
+            {
+                return ModbusResponse.Fail("Error: Configuration is null.");
+            }
+            if (config.SprayPasses == null || config.SprayPasses.Count == 0)
+            {
+                return ModbusResponse.Fail("Error: No spray passes available in the configuration.");
+            }
+            if (config.CurrentPassIndex < 0 || config.CurrentPassIndex >= config.SprayPasses.Count)
+            {
+                return ModbusResponse.Fail($"Error: Invalid CurrentPassIndex ({config.CurrentPassIndex}). No active spray pass selected or index out of bounds.");
+            }
+            else // CurrentPassIndex is valid
+            {
+                SprayPass currentPass = config.SprayPasses[config.CurrentPassIndex];
+                if (currentPass.Trajectories == null || !currentPass.Trajectories.Any())
+                {
+                    trajectoriesToProcess = new List<Trajectory>(); // Valid to have an empty pass
+                }
+                else
+                {
+                    trajectoriesToProcess = currentPass.Trajectories;
+                }
+            }
 
             try
             {
                 // Determine how many trajectories to send, respecting the robot's maximum limit.
-                int trajectoriesToSendCount = Math.Min(config.Trajectories.Count, MaxTrajectories);
+                int trajectoriesToSendCount = Math.Min(trajectoriesToProcess.Count, MaxTrajectories);
 
                 // Write the total number of trajectories being sent.
                 modbusClient.WriteSingleRegister(TrajectoryCountRegister, trajectoriesToSendCount);
@@ -109,7 +133,7 @@ namespace RobTeach.Services
                 // Loop through each trajectory to be sent.
                 for (int i = 0; i < trajectoriesToSendCount; i++)
                 {
-                    var traj = config.Trajectories[i];
+                    var traj = trajectoriesToProcess[i];
                     // Determine how many points to send for the current trajectory, respecting the per-trajectory limit.
                     int pointsInCurrentTraj = Math.Min(traj.Points.Count, MaxPointsPerTrajectory);
 
