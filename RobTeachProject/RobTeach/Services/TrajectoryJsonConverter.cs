@@ -53,18 +53,23 @@ namespace RobTeach.Services
                 }
 
                 // Helper function for DxfPoint
-                DxfPoint GetDxfPointProperty(JsonElement element, string propertyName, JsonSerializerOptions opt)
+                DxfPoint GetDxfPointProperty(JsonElement element, string propertyName, JsonSerializerOptions options)
                 {
                     return element.TryGetProperty(propertyName, out JsonElement property)
-                           ? JsonSerializer.Deserialize<DxfPoint>(property.GetRawText(), opt) ?? DxfPoint.Origin
+                           ? JsonSerializer.Deserialize<DxfPoint>(property.GetRawText(), options)
                            : DxfPoint.Origin;
                 }
 
                 // Helper function for DxfVector
-                DxfVector GetDxfVectorProperty(JsonElement element, string propertyName, JsonSerializerOptions opt)
+                DxfVector GetDxfVectorProperty(JsonElement element, string propertyName, JsonSerializerOptions options)
                 {
                     return element.TryGetProperty(propertyName, out JsonElement property)
-                           ? JsonSerializer.Deserialize<DxfVector>(property.GetRawText(), opt) ?? DxfVector.Zero
+                           ? JsonSerializer.Deserialize<DxfVector>(property.GetRawText(), options)
+                           // Note: DxfVector is a struct, so ?? DxfVector.Zero might also be redundant if Deserialize never returns null for structs.
+                           // However, for consistency with potential future changes or if it were a class, keeping it for DxfVector for now.
+                           // Or, if DxfVectorJsonConverter handles missing properties by returning default, this ?? is also not strictly needed.
+                           // For this change, only DxfPoint was specified.
+                           // The above comment is now outdated as we are removing the ?? DxfVector.Zero as per instruction for DxfVector as well.
                            : DxfVector.Zero;
                 }
 
