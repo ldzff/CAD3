@@ -134,7 +134,11 @@ namespace RobTeach.Services
             WriteIndented = true,
             PropertyNameCaseInsensitive = true, // Good for robustness if config files are manually edited
             // PropertyNamingPolicy = JsonNamingPolicy.CamelCase, // Optional: if you prefer camelCase in JSON
-            Converters = { new DxfPointJsonConverter(), new DxfVectorJsonConverter() }
+            Converters = {
+                new DxfPointJsonConverter(),
+                new DxfVectorJsonConverter(),
+                new TrajectoryJsonConverter() // Added new converter
+            }
         };
 
         /// <summary>
