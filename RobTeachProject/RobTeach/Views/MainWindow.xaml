@@ -76,17 +76,17 @@
                     <CheckBox Name="TrajectoryIsReversedCheckBox" Content="Reverse Direction" Margin="2"/>
                     <StackPanel Name="LineHeightControlsPanel" Orientation="Horizontal" Visibility="Collapsed" Margin="2">
                         <Label Content="Start Z:" VerticalAlignment="Center"/>
-                        <TextBox Name="LineStartZTextBox" Width="50" IsReadOnly="False" VerticalAlignment="Center" Margin="2,0"/>
+                        <TextBox Name="LineStartZTextBox" Width="50" IsReadOnly="False" VerticalAlignment="Center" Margin="2,0" TextChanged="LineStartZTextBox_TextChanged"/>
                         <Label Content="End Z:" VerticalAlignment="Center" Margin="5,0,0,0"/>
-                        <TextBox Name="LineEndZTextBox" Width="50" IsReadOnly="False" VerticalAlignment="Center" Margin="2,0"/>
+                        <TextBox Name="LineEndZTextBox" Width="50" IsReadOnly="False" VerticalAlignment="Center" Margin="2,0" TextChanged="LineEndZTextBox_TextChanged"/>
                     </StackPanel>
                     <StackPanel Name="ArcHeightControlsPanel" Orientation="Horizontal" Visibility="Collapsed" Margin="2">
                         <Label Content="Center Z:" VerticalAlignment="Center"/>
-                        <TextBox Name="ArcCenterZTextBox" Width="50" IsReadOnly="False" VerticalAlignment="Center" Margin="2,0"/>
+                        <TextBox Name="ArcCenterZTextBox" Width="50" IsReadOnly="False" VerticalAlignment="Center" Margin="2,0" TextChanged="ArcCenterZTextBox_TextChanged"/>
                     </StackPanel>
                     <StackPanel Name="CircleHeightControlsPanel" Orientation="Horizontal" Visibility="Collapsed" Margin="2">
                         <Label Content="Center Z:" VerticalAlignment="Center"/>
-                        <TextBox Name="CircleCenterZTextBox" Width="50" IsReadOnly="False" VerticalAlignment="Center" Margin="2,0"/>
+                        <TextBox Name="CircleCenterZTextBox" Width="50" IsReadOnly="False" VerticalAlignment="Center" Margin="2,0" TextChanged="CircleCenterZTextBox_TextChanged"/>
                     </StackPanel>
                 </StackPanel>
             </GroupBox>
