@@ -1365,9 +1365,75 @@ namespace RobTeach.Views
                 StatusTextBlock.Text = "Load configuration cancelled.";
             }
         }
-        private void ModbusConnectButton_Click(object sender, RoutedEventArgs e) { /* ... (No change) ... */ }
-        private void ModbusDisconnectButton_Click(object sender, RoutedEventArgs e) { /* ... (No change) ... */ }
-        private void SendToRobotButton_Click(object sender, RoutedEventArgs e) { /* ... (No change) ... */ }
+        private void ModbusConnectButton_Click(object sender, RoutedEventArgs e)
+        {
+            string ipAddress = ModbusIpAddressTextBox.Text;
+            string portString = ModbusPortTextBox.Text;
+
+            if (string.IsNullOrEmpty(ipAddress))
+            {
+                MessageBox.Show("IP address cannot be empty.", "Input Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            if (!int.TryParse(portString, out int port) || port < 1 || port > 65535)
+            {
+                MessageBox.Show("Invalid port number. Please enter a number between 1 and 65535.", "Input Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            ModbusResponse response = _modbusService.Connect(ipAddress, port);
+            ModbusStatusTextBlock.Text = response.Message;
+
+            if (response.IsSuccess)
+            {
+                ModbusStatusIndicatorEllipse.Fill = Brushes.Green;
+                ModbusConnectButton.IsEnabled = false;
+                ModbusDisconnectButton.IsEnabled = true;
+                SendToRobotButton.IsEnabled = true;
+                StatusTextBlock.Text = "Successfully connected to Modbus server.";
+            }
+            else
+            {
+                ModbusStatusIndicatorEllipse.Fill = Brushes.Red;
+                StatusTextBlock.Text = "Failed to connect to Modbus server.";
+            }
+        }
+
+        private void ModbusDisconnectButton_Click(object sender, RoutedEventArgs e)
+        {
+            _modbusService.Disconnect();
+            ModbusStatusTextBlock.Text = "Disconnected";
+            ModbusStatusIndicatorEllipse.Fill = Brushes.Red;
+            ModbusConnectButton.IsEnabled = true;
+            ModbusDisconnectButton.IsEnabled = false;
+            SendToRobotButton.IsEnabled = false;
+            StatusTextBlock.Text = "Disconnected from Modbus server.";
+        }
+
+        private void SendToRobotButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (!_modbusService.IsConnected)
+            {
+                MessageBox.Show("Not connected to Modbus server. Please connect first.", "Modbus Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            _currentConfiguration.ProductName = ProductNameTextBox.Text; // Ensure latest product name
+            ModbusResponse response = _modbusService.SendConfiguration(_currentConfiguration);
+
+            // Using StatusTextBlock for general feedback seems more consistent with other operations
+            if (response.IsSuccess)
+            {
+                StatusTextBlock.Text = "Configuration successfully sent to robot.";
+                ModbusStatusTextBlock.Text = response.Message; // Keep specific Modbus status updated too
+            }
+            else
+            {
+                StatusTextBlock.Text = $"Failed to send configuration: {response.Message}";
+                ModbusStatusTextBlock.Text = response.Message; // Update Modbus status as well
+            }
+        }
 
         /// <summary>
         /// Calculates the overall bounding box of the DXF document, considering header extents and all entity extents.
