@@ -773,18 +773,21 @@ namespace RobTeach.Views
             }
         }
 
-    private void LineStartZTextBox_LostFocus(object sender, RoutedEventArgs e)
+    private void UpdateLineStartZFromTextBox()
     {
         if (CurrentPassTrajectoriesListBox.SelectedItem is Trajectory selectedTrajectory && selectedTrajectory.PrimitiveType == "Line")
         {
             if (double.TryParse(LineStartZTextBox.Text, out double newZ))
             {
-                selectedTrajectory.LineStartPoint = new DxfPoint(
-                    selectedTrajectory.LineStartPoint.X,
-                    selectedTrajectory.LineStartPoint.Y,
-                    newZ);
-                isConfigurationDirty = true;
-                CurrentPassTrajectoriesListBox.Items.Refresh();
+                if (selectedTrajectory.LineStartPoint.Z != newZ)
+                {
+                    selectedTrajectory.LineStartPoint = new DxfPoint(
+                        selectedTrajectory.LineStartPoint.X,
+                        selectedTrajectory.LineStartPoint.Y,
+                        newZ);
+                    isConfigurationDirty = true;
+                    CurrentPassTrajectoriesListBox.Items.Refresh(); // Refresh if Z might be part of ToString()
+                }
             }
             else
             {
@@ -794,18 +797,26 @@ namespace RobTeach.Views
         }
     }
 
-    private void LineEndZTextBox_LostFocus(object sender, RoutedEventArgs e)
+    private void LineStartZTextBox_LostFocus(object sender, RoutedEventArgs e)
+    {
+        UpdateLineStartZFromTextBox();
+    }
+
+    private void UpdateLineEndZFromTextBox()
     {
         if (CurrentPassTrajectoriesListBox.SelectedItem is Trajectory selectedTrajectory && selectedTrajectory.PrimitiveType == "Line")
         {
             if (double.TryParse(LineEndZTextBox.Text, out double newZ))
             {
-                selectedTrajectory.LineEndPoint = new DxfPoint(
-                    selectedTrajectory.LineEndPoint.X,
-                    selectedTrajectory.LineEndPoint.Y,
-                    newZ);
-                isConfigurationDirty = true;
-                CurrentPassTrajectoriesListBox.Items.Refresh();
+                if (selectedTrajectory.LineEndPoint.Z != newZ)
+                {
+                    selectedTrajectory.LineEndPoint = new DxfPoint(
+                        selectedTrajectory.LineEndPoint.X,
+                        selectedTrajectory.LineEndPoint.Y,
+                        newZ);
+                    isConfigurationDirty = true;
+                    CurrentPassTrajectoriesListBox.Items.Refresh(); // Refresh if Z might be part of ToString()
+                }
             }
             else
             {
@@ -815,18 +826,26 @@ namespace RobTeach.Views
         }
     }
 
-    private void ArcCenterZTextBox_LostFocus(object sender, RoutedEventArgs e)
+    private void LineEndZTextBox_LostFocus(object sender, RoutedEventArgs e)
+    {
+        UpdateLineEndZFromTextBox();
+    }
+
+    private void UpdateArcCenterZFromTextBox()
     {
         if (CurrentPassTrajectoriesListBox.SelectedItem is Trajectory selectedTrajectory && selectedTrajectory.PrimitiveType == "Arc")
         {
             if (double.TryParse(ArcCenterZTextBox.Text, out double newZ))
             {
-                selectedTrajectory.ArcCenter = new DxfPoint(
-                    selectedTrajectory.ArcCenter.X,
-                    selectedTrajectory.ArcCenter.Y,
-                    newZ);
-                isConfigurationDirty = true;
-                CurrentPassTrajectoriesListBox.Items.Refresh();
+                if (selectedTrajectory.ArcCenter.Z != newZ)
+                {
+                    selectedTrajectory.ArcCenter = new DxfPoint(
+                        selectedTrajectory.ArcCenter.X,
+                        selectedTrajectory.ArcCenter.Y,
+                        newZ);
+                    isConfigurationDirty = true;
+                    CurrentPassTrajectoriesListBox.Items.Refresh(); // Refresh if Z might be part of ToString()
+                }
             }
             else
             {
@@ -836,18 +855,26 @@ namespace RobTeach.Views
         }
     }
 
-    private void CircleCenterZTextBox_LostFocus(object sender, RoutedEventArgs e)
+    private void ArcCenterZTextBox_LostFocus(object sender, RoutedEventArgs e)
+    {
+        UpdateArcCenterZFromTextBox();
+    }
+
+    private void UpdateCircleCenterZFromTextBox()
     {
         if (CurrentPassTrajectoriesListBox.SelectedItem is Trajectory selectedTrajectory && selectedTrajectory.PrimitiveType == "Circle")
         {
             if (double.TryParse(CircleCenterZTextBox.Text, out double newZ))
             {
-                selectedTrajectory.CircleCenter = new DxfPoint(
-                    selectedTrajectory.CircleCenter.X,
-                    selectedTrajectory.CircleCenter.Y,
-                    newZ);
-                isConfigurationDirty = true;
-                CurrentPassTrajectoriesListBox.Items.Refresh();
+                if (selectedTrajectory.CircleCenter.Z != newZ)
+                {
+                    selectedTrajectory.CircleCenter = new DxfPoint(
+                        selectedTrajectory.CircleCenter.X,
+                        selectedTrajectory.CircleCenter.Y,
+                        newZ);
+                    isConfigurationDirty = true;
+                    CurrentPassTrajectoriesListBox.Items.Refresh(); // Refresh if Z might be part of ToString()
+                }
             }
             else
             {
@@ -855,6 +882,11 @@ namespace RobTeach.Views
                 CircleCenterZTextBox.Text = selectedTrajectory.CircleCenter.Z.ToString("F3"); // Revert
             }
         }
+    }
+
+    private void CircleCenterZTextBox_LostFocus(object sender, RoutedEventArgs e)
+    {
+        UpdateCircleCenterZFromTextBox();
     }
 
         /// <summary>
@@ -1576,6 +1608,12 @@ namespace RobTeach.Views
         /// </summary>
         private bool PerformSaveOperation()
         {
+            // Call update methods at the beginning of save operation
+            UpdateLineStartZFromTextBox();
+            UpdateLineEndZFromTextBox();
+            UpdateArcCenterZFromTextBox();
+            UpdateCircleCenterZFromTextBox();
+
             // This logic is largely moved from the original SaveConfigButton_Click
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
