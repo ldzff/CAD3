@@ -1385,7 +1385,7 @@ namespace RobTeach.Views
             ModbusResponse response = _modbusService.Connect(ipAddress, port);
             ModbusStatusTextBlock.Text = response.Message;
 
-            if (response.IsSuccess)
+            if (response.Success)
             {
                 ModbusStatusIndicatorEllipse.Fill = Brushes.Green;
                 ModbusConnectButton.IsEnabled = false;
@@ -1423,7 +1423,7 @@ namespace RobTeach.Views
             ModbusResponse response = _modbusService.SendConfiguration(_currentConfiguration);
 
             // Using StatusTextBlock for general feedback seems more consistent with other operations
-            if (response.IsSuccess)
+            if (response.Success)
             {
                 StatusTextBlock.Text = "Configuration successfully sent to robot.";
                 ModbusStatusTextBlock.Text = response.Message; // Keep specific Modbus status updated too
