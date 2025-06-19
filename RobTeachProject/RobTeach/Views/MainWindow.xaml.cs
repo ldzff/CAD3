@@ -1078,12 +1078,12 @@ namespace RobTeach.Views
 
                 if (existingTrajectory != null)
                 {
-                    // Deselect - Remove from current pass
-                    Trace.WriteLine("  -- Existing trajectory found. Removing it.");
+                    // Entity is already part of the current pass. Mark it for selection.
+                    Trace.WriteLine("  -- Existing trajectory found. Selecting it.");
                     Trace.Flush();
-                    currentPass.Trajectories.Remove(existingTrajectory);
-                    isConfigurationDirty = true;
-                    // trajectoryToSelect remains null, so selection will likely clear or move.
+                    trajectoryToSelect = existingTrajectory;
+                    // Do NOT remove it from currentPass.Trajectories.
+                    // Do NOT set isConfigurationDirty = true just for re-selecting.
                 }
                 else
                 {
