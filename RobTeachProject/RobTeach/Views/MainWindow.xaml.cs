@@ -389,6 +389,7 @@ namespace RobTeach.Views
             Trace.Flush();
             UpdateSelectedTrajectoryDetailUI(); // Renamed
             UpdateDirectionIndicator(); // Add call to update direction indicator
+    RefreshCadCanvasHighlights(); // <-- ADD THIS LINE
         }
 
         private void UpdateDirectionIndicator()
@@ -419,27 +420,28 @@ namespace RobTeach.Views
             }
 
             const double fixedArrowLineLength = 8.0; // Fixed visual length for the arrow's line segment
+            Trajectory? actuallySelectedItem = CurrentPassTrajectoriesListBox.SelectedItem as Trajectory; // Get selected item once
 
-            foreach (var selectedTrajectory in currentPass.Trajectories)
+            foreach (var trajectoryInLoop in currentPass.Trajectories) // Renamed loop variable for clarity
             {
-                if (selectedTrajectory.Points == null || !selectedTrajectory.Points.Any())
+                if (trajectoryInLoop.Points == null || !trajectoryInLoop.Points.Any())
                 {
                     continue; // Skip if no points
                 }
 
                 var newIndicator = new DirectionIndicator
                 {
-                    Color = SelectedStrokeBrush,
+                    Color = (trajectoryInLoop == actuallySelectedItem) ? SelectedStrokeBrush : DefaultStrokeBrush,
                     ArrowheadSize = 8,
                     StrokeThickness = 1.5
                 };
 
-                List<System.Windows.Point> points = selectedTrajectory.Points;
+                List<System.Windows.Point> points = trajectoryInLoop.Points;
                 Point arrowStartPoint = new Point();
                 Point arrowEndPoint = new Point();
                 bool addIndicator = false;
 
-                switch (selectedTrajectory.PrimitiveType)
+                switch (trajectoryInLoop.PrimitiveType)
                 {
                     case "Line":
                         if (points.Count >= 2)
@@ -1909,6 +1911,7 @@ namespace RobTeach.Views
                 _currentConfiguration.CanvasState.TranslateX = _translateTransform.X;
                 _currentConfiguration.CanvasState.TranslateY = _translateTransform.Y;
 
+                _currentConfiguration.SelectedTrajectoryIndexInCurrentPass = CurrentPassTrajectoriesListBox.SelectedIndex;
                 // This is done before deciding what to filter into configToSave.
 
                 Configuration configToSave = new Configuration
@@ -1920,6 +1923,7 @@ namespace RobTeach.Views
                     ModbusIpAddress = _currentConfiguration.ModbusIpAddress,
                     ModbusPort = _currentConfiguration.ModbusPort,
                     CanvasState = _currentConfiguration.CanvasState,
+                    SelectedTrajectoryIndexInCurrentPass = _currentConfiguration.SelectedTrajectoryIndexInCurrentPass, // <-- ADD THIS LINE
                     SprayPasses = new List<SprayPass>()
                 };
 
