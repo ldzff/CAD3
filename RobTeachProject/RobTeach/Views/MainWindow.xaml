@@ -47,7 +47,7 @@
             <GroupBox Header="Spray Pass Management" Margin="5,0,5,0" Padding="5" VerticalAlignment="Top" Foreground="{StaticResource DefaultTextBrush}">
                 <StackPanel Orientation="Vertical">
                     <Label Content="Available Passes:" Margin="2"/>
-                    <ListBox Name="SprayPassesListBox" Height="60" Margin="2" DisplayMemberPath="PassName" Foreground="{StaticResource DefaultTextBrush}"/>
+                    <ListBox Name="SprayPassesListBox" Height="60" Margin="2" DisplayMemberPath="PassName"/>
                     <StackPanel Orientation="Horizontal" Margin="2" HorizontalAlignment="Center">
                         <Button Name="AddPassButton" Content="Add Pass" Margin="2,0"/>
                         <Button Name="RemovePassButton" Content="Remove Pass" Margin="2,0"/>
@@ -59,7 +59,7 @@
             <GroupBox Header="Trajectory Sequence (Current Pass)" Margin="5,0,5,0" Padding="5" VerticalAlignment="Top" Foreground="{StaticResource DefaultTextBrush}">
                 <StackPanel Orientation="Vertical">
                     <Label Content="Execution Order:" Margin="2"/>
-                    <ListBox Name="CurrentPassTrajectoriesListBox" Height="100" Margin="2" Foreground="{StaticResource DefaultTextBrush}"/>
+                    <ListBox Name="CurrentPassTrajectoriesListBox" Height="100" Margin="2"/>
                     <StackPanel Orientation="Horizontal" Margin="2" HorizontalAlignment="Center">
                         <Button Name="MoveTrajectoryUpButton" Content="Move Up" Margin="2,0"/>
                         <Button Name="MoveTrajectoryDownButton" Content="Move Down" Margin="2,0"/>
