@@ -1426,6 +1426,15 @@ namespace RobTeach.Views
                     // LowerNozzleOnCheckBox_Changed(null, null); // Removed
 
                     RefreshCurrentPassTrajectoriesListBox(); // Update trajectory list for the (newly) current pass
+
+                    // Restore selected trajectory index for the current pass
+                    if (_currentConfiguration.SelectedTrajectoryIndexInCurrentPass >= 0 &&
+                        _currentConfiguration.SelectedTrajectoryIndexInCurrentPass < CurrentPassTrajectoriesListBox.Items.Count)
+                    {
+                        CurrentPassTrajectoriesListBox.SelectedIndex = _currentConfiguration.SelectedTrajectoryIndexInCurrentPass;
+                    }
+                    // else, no valid selection or list is empty, ListBox default behavior (no selection or first item)
+
                     UpdateSelectedTrajectoryDetailUI(); // Renamed: Update nozzle UI for potentially selected trajectory
                     RefreshCadCanvasHighlights(); // Update canvas highlights for the loaded pass
                     UpdateDirectionIndicator(); // Config loaded, selection might have changed

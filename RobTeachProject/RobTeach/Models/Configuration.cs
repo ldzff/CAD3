@@ -51,6 +51,12 @@ namespace RobTeach.Models
         public int CurrentPassIndex { get; set; } = -1;
 
         /// <summary>
+        /// Gets or sets the index of the selected trajectory within the current spray pass (identified by CurrentPassIndex).
+        /// A value of -1 indicates no trajectory is selected.
+        /// </summary>
+        public int SelectedTrajectoryIndexInCurrentPass { get; set; } = -1;
+
+        /// <summary>
         /// Gets or sets the transformation parameters associated with this configuration.
         /// This is a placeholder for future functionality like scaling, offsetting, or rotating
         /// the entire set of trajectories.
