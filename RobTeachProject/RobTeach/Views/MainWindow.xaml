@@ -30,9 +30,10 @@
         <Canvas Grid.Row="1" Name="CadCanvas" Background="LightGray" Margin="5" ClipToBounds="True"/>
 
         <!-- Configuration and Action Panel -->
-        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="5" VerticalAlignment="Top">
-            <Label Content="Product:" VerticalAlignment="Center"/>
-            <TextBox Name="ProductNameTextBox" Width="120" VerticalAlignment="Center" Margin="0,0,10,0" Text="DefaultProduct"/>
+        <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Margin="5" VerticalAlignment="Top">
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Product:" VerticalAlignment="Center"/>
+                <TextBox Name="ProductNameTextBox" Width="120" VerticalAlignment="Center" Margin="0,0,10,0" Text="DefaultProduct"/>
 
             <GroupBox Header="Spray Pass Management" Margin="5,0,10,0" Padding="5" VerticalAlignment="Top">
                 <StackPanel Orientation="Vertical">
@@ -96,7 +97,8 @@
                 </StackPanel>
             </GroupBox>
 
-        </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
 
         <!-- Modbus Panel -->
         <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="5" VerticalAlignment="Center">
