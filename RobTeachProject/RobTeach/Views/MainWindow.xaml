@@ -41,7 +41,7 @@
         <!-- Configuration and Action Panel -->
         <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Margin="5" VerticalAlignment="Top" Background="{StaticResource PanelBackgroundBrush}">
             <StackPanel Orientation="Horizontal">
-                <Label Content="Product:" VerticalAlignment="Center"/>
+                <Label Content="Product:" VerticalAlignment="Center" Foreground="{StaticResource DefaultTextBrush}"/>
                 <TextBox Name="ProductNameTextBox" Width="120" VerticalAlignment="Center" Margin="0,0,5,0" Text="DefaultProduct"/>
 
             <GroupBox Header="Spray Pass Management" Margin="5,0,5,0" Padding="5" VerticalAlignment="Top" Foreground="{StaticResource DefaultTextBrush}">
@@ -111,9 +111,9 @@
 
         <!-- Modbus Panel -->
         <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="5" VerticalAlignment="Center" Background="{StaticResource PanelBackgroundBrush}">
-            <Label Content="Modbus IP:" VerticalAlignment="Center"/>
+            <Label Content="Modbus IP:" VerticalAlignment="Center" Foreground="{StaticResource DefaultTextBrush}"/>
             <TextBox Name="ModbusIpAddressTextBox" Width="100" VerticalAlignment="Center" Text="127.0.0.1" Margin="0,0,10,0"/>
-            <Label Content="Port:" VerticalAlignment="Center"/>
+            <Label Content="Port:" VerticalAlignment="Center" Foreground="{StaticResource DefaultTextBrush}"/>
             <TextBox Name="ModbusPortTextBox" Width="40" VerticalAlignment="Center" Text="502" Margin="0,0,10,0"/>
             <Button Content="Connect" Name="ModbusConnectButton" Click="ModbusConnectButton_Click" Margin="5,0,5,0" Padding="5"/>
             <Button Content="Disconnect" Name="ModbusDisconnectButton" Click="ModbusDisconnectButton_Click" Margin="0,0,5,0" Padding="5" IsEnabled="False"/>
