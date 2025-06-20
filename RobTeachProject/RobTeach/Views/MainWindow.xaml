@@ -7,7 +7,16 @@
         mc:Ignorable="d"
         Title="RobTeach Application" Height="550" Width="850"
         Closing="MainWindow_Closing"
-        WindowState="Maximized">
+        WindowState="Maximized"
+        Background="{StaticResource WindowBackgroundBrush}"
+        Foreground="{StaticResource DefaultTextBrush}">
+    <Window.Resources>
+        <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#FF2D2D30"/>
+        <SolidColorBrush x:Key="PanelBackgroundBrush" Color="#FF3F3F46"/>
+        <SolidColorBrush x:Key="DefaultTextBrush" Color="#FFE0E0E0"/>
+        <SolidColorBrush x:Key="CanvasBackgroundBrush" Color="#FF424242"/>
+        <SolidColorBrush x:Key="BorderBrush" Color="#FF555555"/>
+    </Window.Resources>
     <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
         <!-- Viewbox removed -->
         <Grid MinWidth="850" MinHeight="520"> <!-- RootContentGrid with MinWidth/MinHeight -->
@@ -20,17 +29,17 @@
         </Grid.RowDefinitions>
 
         <!-- Load DXF and Actions Button Bar -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="5">
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="5" Background="{StaticResource PanelBackgroundBrush}">
             <Button Content="Load DXF" Click="LoadDxfButton_Click" Name="LoadDxfButton" Padding="5" Margin="0,0,5,0"/>
             <Button Content="Save Config" Name="SaveConfigButton" Click="SaveConfigButton_Click" Padding="5" Margin="0,0,5,0"/>
             <Button Content="Load Config" Name="LoadConfigButton" Click="LoadConfigButton_Click" Padding="5" Margin="0,0,5,0"/>
             <Button Content="Fit to View" Click="FitToViewButton_Click" Name="FitToViewButton" Padding="5" Margin="0,0,0,0"/>
         </StackPanel>
 
-        <Canvas Grid.Row="1" Name="CadCanvas" Background="LightGray" Margin="5" ClipToBounds="True"/>
+        <Canvas Grid.Row="1" Name="CadCanvas" Background="{StaticResource CanvasBackgroundBrush}" Margin="5" ClipToBounds="True"/>
 
         <!-- Configuration and Action Panel -->
-        <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Margin="5" VerticalAlignment="Top">
+        <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Margin="5" VerticalAlignment="Top" Background="{StaticResource PanelBackgroundBrush}">
             <StackPanel Orientation="Horizontal">
                 <Label Content="Product:" VerticalAlignment="Center"/>
                 <TextBox Name="ProductNameTextBox" Width="120" VerticalAlignment="Center" Margin="0,0,5,0" Text="DefaultProduct"/>
@@ -101,7 +110,7 @@
         </ScrollViewer>
 
         <!-- Modbus Panel -->
-        <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="5" VerticalAlignment="Center">
+        <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="5" VerticalAlignment="Center" Background="{StaticResource PanelBackgroundBrush}">
             <Label Content="Modbus IP:" VerticalAlignment="Center"/>
             <TextBox Name="ModbusIpAddressTextBox" Width="100" VerticalAlignment="Center" Text="127.0.0.1" Margin="0,0,10,0"/>
             <Label Content="Port:" VerticalAlignment="Center"/>
@@ -113,7 +122,7 @@
             <TextBlock Name="ModbusStatusTextBlock" Text="Disconnected" VerticalAlignment="Center" Margin="5,0,0,0"/>
         </StackPanel>
 
-        <StatusBar Grid.Row="4" Margin="5,0,5,5">
+        <StatusBar Grid.Row="4" Margin="5,0,5,5" Background="{StaticResource PanelBackgroundBrush}" Foreground="{StaticResource DefaultTextBrush}">
             <TextBlock Name="StatusTextBlock" Text="Ready"/>
         </StatusBar>
         </Grid>
