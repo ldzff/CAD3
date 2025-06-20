@@ -9,11 +9,11 @@
         Closing="MainWindow_Closing"
         WindowState="Maximized">
     <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-        <Viewbox Stretch="Uniform" MinWidth="800" MinHeight="500">
-            <Grid Width="850" Height="520">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/> <!-- Row 0 for Load DXF / Actions -->
-                    <RowDefinition Height="*"/>    <!-- Row 1 for CadCanvas -->
+        <!-- Viewbox removed -->
+        <Grid MinWidth="850" MinHeight="520"> <!-- RootContentGrid with MinWidth/MinHeight -->
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/> <!-- Row 0 for Load DXF / Actions -->
+                <RowDefinition Height="*"/>    <!-- Row 1 for CadCanvas -->
             <RowDefinition Height="Auto"/> <!-- Row 2 for Config/Action Panel -->
             <RowDefinition Height="Auto"/> <!-- Row 3 for Modbus Panel -->
             <RowDefinition Height="Auto"/> <!-- Row 4 for StatusBar -->
@@ -116,7 +116,7 @@
         <StatusBar Grid.Row="4">
             <TextBlock Name="StatusTextBlock" Text="Ready"/>
         </StatusBar>
-            </Grid>
-        </Viewbox>
+        </Grid>
+        <!-- Viewbox removed -->
     </ScrollViewer>
 </Window>
