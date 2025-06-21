@@ -66,7 +66,7 @@ namespace RobTeach.Views
         private bool isSelectingWithRect = false;                         // Flag indicating if marquee selection is active
 
         // Styling constants for visual feedback
-        private static readonly Brush DefaultStrokeBrush = Brushes.DarkSlateGray; // Default color for CAD shapes.
+        private static readonly Brush DefaultStrokeBrush = Brushes.LightGray; // Default color for CAD shapes.
         private static readonly Brush SelectedStrokeBrush = Brushes.DodgerBlue;   // Color for selected CAD shapes.
         private const double DefaultStrokeThickness = 2;                          // Default stroke thickness.
         private const double SelectedStrokeThickness = 3.5;                       // Thickness for selected shapes and trajectories.
