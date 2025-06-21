@@ -1626,8 +1626,39 @@ namespace RobTeach.Views
         }
 
         private void FitToViewButton_Click(object sender, RoutedEventArgs e) { /* ... (No change) ... */ }
-        private void PerformFitToView() { /* ... (No change) ... */
+        private void PerformFitToView()
+        {
             CadCanvas.UpdateLayout();
+            double canvasWidth = CadCanvas.ActualWidth;
+            double canvasHeight = CadCanvas.ActualHeight;
+
+            if (_currentDxfDocument == null || _dxfBoundingBox.Width <= 0 || _dxfBoundingBox.Height <= 0 || canvasWidth <= 0 || canvasHeight <= 0)
+            {
+                _scaleTransform.ScaleX = 1.0;
+                _scaleTransform.ScaleY = 1.0;
+                _translateTransform.X = 0.0;
+                _translateTransform.Y = 0.0;
+                // _isViewCurrentlyFitted = true; // Set at the end
+            }
+            else
+            {
+                double scaleX = canvasWidth / _dxfBoundingBox.Width;
+                double scaleY = canvasHeight / _dxfBoundingBox.Height;
+                double scale = Math.Min(scaleX, scaleY);
+
+                if (scale <= 0 || double.IsNaN(scale) || double.IsInfinity(scale))
+                {
+                    Debug.WriteLine($"[PerformFitToView] Invalid scale calculated ({scale}). Defaulting to 1.0. DXF Box: {_dxfBoundingBox}, Canvas: {canvasWidth}x{canvasHeight}");
+                    scale = 1.0;
+                }
+
+                _scaleTransform.ScaleX = scale;
+                _scaleTransform.ScaleY = scale;
+
+                // Center the content
+                _translateTransform.X = (canvasWidth - (_dxfBoundingBox.Width * scale)) / 2.0 - (_dxfBoundingBox.Left * scale);
+                _translateTransform.Y = (canvasHeight - (_dxfBoundingBox.Height * scale)) / 2.0 - (_dxfBoundingBox.Top * scale);
+            }
             _isViewCurrentlyFitted = true;
         }
         private void CadCanvas_MouseWheel(object sender, MouseWheelEventArgs e) { /* ... (No change) ... */
