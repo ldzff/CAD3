@@ -58,6 +58,7 @@ namespace RobTeach.Views
         private TransformGroup _transformGroup;         // Combines scale and translate transforms.
         private System.Windows.Point _panStartPoint;    // Qualified: Stores the starting point of a mouse pan operation.
         private bool _isPanning;                        // Flag indicating if a pan operation is currently in progress.
+        private bool _isViewCurrentlyFitted = false;
         private Rect _dxfBoundingBox = Rect.Empty;      // Stores the calculated bounding box of the entire loaded DXF document.
 
         // Fields for Marquee Selection
@@ -1625,8 +1626,12 @@ namespace RobTeach.Views
         }
 
         private void FitToViewButton_Click(object sender, RoutedEventArgs e) { /* ... (No change) ... */ }
-        private void PerformFitToView() { /* ... (No change) ... */ }
-        private void CadCanvas_MouseWheel(object sender, MouseWheelEventArgs e) { /* ... (No change) ... */ }
+        private void PerformFitToView() { /* ... (No change) ... */
+            _isViewCurrentlyFitted = true;
+        }
+        private void CadCanvas_MouseWheel(object sender, MouseWheelEventArgs e) { /* ... (No change) ... */
+            _isViewCurrentlyFitted = false;
+        }
         private void CadCanvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.MiddleButton == MouseButtonState.Pressed ||
@@ -1710,6 +1715,7 @@ namespace RobTeach.Views
                 _isPanning = false;
                 CadCanvas.ReleaseMouseCapture();
                 StatusTextBlock.Text = "Pan complete.";
+                _isViewCurrentlyFitted = false;
                 e.Handled = true;
             }
             else if (isSelectingWithRect)
@@ -1830,6 +1836,20 @@ namespace RobTeach.Views
                 e.Handled = true;
             }
         }
+
+    private void CadCanvas_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        // Check if the view is meant to be fitted, if a DXF is loaded,
+        // if the new size is valid, and if the size actually changed.
+        if (_isViewCurrentlyFitted &&
+            _currentDxfDocument != null &&
+            e.NewSize.Width > 0 && e.NewSize.Height > 0 &&
+            (e.PreviousSize.IsEmpty || Math.Abs(e.PreviousSize.Width - e.NewSize.Width) > 0.001 || Math.Abs(e.PreviousSize.Height - e.NewSize.Height) > 0.001))
+        {
+            // Using Math.Abs for floating point comparison of size change
+            PerformFitToView();
+        }
+    }
         /// <summary>
         /// Calculates the bounding rectangle for a given DXF entity.
         /// </summary>
