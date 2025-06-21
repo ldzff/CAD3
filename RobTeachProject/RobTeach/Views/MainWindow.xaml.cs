@@ -1627,6 +1627,7 @@ namespace RobTeach.Views
 
         private void FitToViewButton_Click(object sender, RoutedEventArgs e) { /* ... (No change) ... */ }
         private void PerformFitToView() { /* ... (No change) ... */
+            CadCanvas.UpdateLayout();
             _isViewCurrentlyFitted = true;
         }
         private void CadCanvas_MouseWheel(object sender, MouseWheelEventArgs e) { /* ... (No change) ... */
