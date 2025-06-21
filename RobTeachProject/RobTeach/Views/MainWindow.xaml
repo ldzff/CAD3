@@ -46,7 +46,7 @@
 
             <GroupBox Header="Spray Pass Management" Margin="5,0,5,0" Padding="5" VerticalAlignment="Top" Foreground="{StaticResource DefaultTextBrush}">
                 <StackPanel Orientation="Vertical">
-                    <Label Content="Available Passes:" Margin="2"/>
+                    <Label Content="Available Passes:" Margin="2" Foreground="{StaticResource DefaultTextBrush}"/>
                     <ListBox Name="SprayPassesListBox" Height="60" Margin="2" DisplayMemberPath="PassName"/>
                     <StackPanel Orientation="Horizontal" Margin="2" HorizontalAlignment="Center">
                         <Button Name="AddPassButton" Content="Add Pass" Margin="2,0"/>
@@ -58,7 +58,7 @@
 
             <GroupBox Header="Trajectory Sequence (Current Pass)" Margin="5,0,5,0" Padding="5" VerticalAlignment="Top" Foreground="{StaticResource DefaultTextBrush}">
                 <StackPanel Orientation="Vertical">
-                    <Label Content="Execution Order:" Margin="2"/>
+                    <Label Content="Execution Order:" Margin="2" Foreground="{StaticResource DefaultTextBrush}"/>
                     <ListBox Name="CurrentPassTrajectoriesListBox" Height="100" Margin="2"/>
                     <StackPanel Orientation="Horizontal" Margin="2" HorizontalAlignment="Center">
                         <Button Name="MoveTrajectoryUpButton" Content="Move Up" Margin="2,0"/>
@@ -90,17 +90,17 @@
                 <StackPanel Orientation="Vertical">
                     <CheckBox Name="TrajectoryIsReversedCheckBox" Content="Reverse Direction" Margin="2" Foreground="{StaticResource DefaultTextBrush}"/>
                     <StackPanel Name="LineHeightControlsPanel" Orientation="Horizontal" Visibility="Collapsed" Margin="2">
-                        <Label Content="Start Z:" VerticalAlignment="Center"/>
+                        <Label Content="Start Z:" VerticalAlignment="Center" Foreground="{StaticResource DefaultTextBrush}"/>
                         <TextBox Name="LineStartZTextBox" Width="50" IsReadOnly="False" VerticalAlignment="Center" Margin="2,0" TextChanged="LineStartZTextBox_TextChanged"/>
-                        <Label Content="End Z:" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                        <Label Content="End Z:" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="{StaticResource DefaultTextBrush}"/>
                         <TextBox Name="LineEndZTextBox" Width="50" IsReadOnly="False" VerticalAlignment="Center" Margin="2,0" TextChanged="LineEndZTextBox_TextChanged"/>
                     </StackPanel>
                     <StackPanel Name="ArcHeightControlsPanel" Orientation="Horizontal" Visibility="Collapsed" Margin="2">
-                        <Label Content="Center Z:" VerticalAlignment="Center"/>
+                        <Label Content="Center Z:" VerticalAlignment="Center" Foreground="{StaticResource DefaultTextBrush}"/>
                         <TextBox Name="ArcCenterZTextBox" Width="50" IsReadOnly="False" VerticalAlignment="Center" Margin="2,0" TextChanged="ArcCenterZTextBox_TextChanged"/>
                     </StackPanel>
                     <StackPanel Name="CircleHeightControlsPanel" Orientation="Horizontal" Visibility="Collapsed" Margin="2">
-                        <Label Content="Center Z:" VerticalAlignment="Center"/>
+                        <Label Content="Center Z:" VerticalAlignment="Center" Foreground="{StaticResource DefaultTextBrush}"/>
                         <TextBox Name="CircleCenterZTextBox" Width="50" IsReadOnly="False" VerticalAlignment="Center" Margin="2,0" TextChanged="CircleCenterZTextBox_TextChanged"/>
                     </StackPanel>
                 </StackPanel>
