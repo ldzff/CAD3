@@ -1632,17 +1632,32 @@ namespace RobTeach.Views
             double canvasWidth = CadCanvas.ActualWidth;
             double canvasHeight = CadCanvas.ActualHeight;
 
-            if (_currentDxfDocument == null || _dxfBoundingBox.Width <= 0 || _dxfBoundingBox.Height <= 0 || canvasWidth <= 0 || canvasHeight <= 0)
+            // If canvas size is not yet valid (e.g., during a rapid layout change),
+            // do nothing and wait for a subsequent SizeChanged event with valid dimensions.
+            // Importantly, do not change _isViewCurrentlyFitted here, as it might have been true
+            // and should remain true for the next valid SizeChanged event to pick up.
+            if (canvasWidth <= 0 || canvasHeight <= 0)
             {
+                Debug.WriteLine($"[PerformFitToView] Canvas dimensions invalid or not ready ({canvasWidth}x{canvasHeight}). Aborting current fit attempt.");
+                return;
+            }
+
+            // If there's no document or the DXF bounding box is invalid (e.g., zero width/height),
+            // reset to a default view. This is considered a "fitted" state (fitted to default).
+            if (_currentDxfDocument == null || _dxfBoundingBox.Width <= 0 || _dxfBoundingBox.Height <= 0)
+            {
+                Debug.WriteLine($"[PerformFitToView] No document or invalid DXF bounds. Resetting view. DXFDoc: {_currentDxfDocument}, BBox: {_dxfBoundingBox}");
                 _scaleTransform.ScaleX = 1.0;
                 _scaleTransform.ScaleY = 1.0;
                 _translateTransform.X = 0.0;
                 _translateTransform.Y = 0.0;
-                // _isViewCurrentlyFitted = true; // Set at the end
+                _isViewCurrentlyFitted = true; // It's now "fitted to a default view"
+                return;
             }
-            else
-            {
-                double scaleX = canvasWidth / _dxfBoundingBox.Width;
+
+            // If we reach here, canvas dimensions are valid and DXF document/bounds are valid.
+            // Proceed with scale and translation calculations...
+            double scaleX = canvasWidth / _dxfBoundingBox.Width;
                 double scaleY = canvasHeight / _dxfBoundingBox.Height;
                 double scale = Math.Min(scaleX, scaleY);
 
@@ -1658,7 +1673,7 @@ namespace RobTeach.Views
                 // Center the content
                 _translateTransform.X = (canvasWidth - (_dxfBoundingBox.Width * scale)) / 2.0 - (_dxfBoundingBox.Left * scale);
                 _translateTransform.Y = (canvasHeight - (_dxfBoundingBox.Height * scale)) / 2.0 - (_dxfBoundingBox.Top * scale);
-            }
+            // After successfully calculating and applying new transforms:
             _isViewCurrentlyFitted = true;
         }
         private void CadCanvas_MouseWheel(object sender, MouseWheelEventArgs e) { /* ... (No change) ... */
