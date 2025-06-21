@@ -307,6 +307,7 @@ namespace RobTeach.Views
                     Padding = new Thickness(2, 0, 2, 0),
                     // ToolTip = $"Order: {i + 1}, Entity: {selectedTrajectory.PrimitiveType}" // Optional: add a tooltip
                 };
+                orderLabel.IsHitTestVisible = false;
 
                 Point anchorPoint;
                 if (selectedTrajectory.PrimitiveType == "Line" && selectedTrajectory.Points.Count >= 2)
@@ -435,6 +436,7 @@ namespace RobTeach.Views
                     ArrowheadSize = 8,
                     StrokeThickness = 1.5
                 };
+                newIndicator.IsHitTestVisible = false;
 
                 List<System.Windows.Point> points = trajectoryInLoop.Points;
                 Point arrowStartPoint = new Point();
